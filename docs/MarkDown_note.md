@@ -115,5 +115,311 @@ _源码_：
 
 例：
 
-
 * [ ] 待办事项一
+* [ ] 待办事项二
+* [ ] 待办事项三
+
+*源码*：
+
+\* [ ] 待办事项一
+\* [ ] 待办事项二
+\* [ ] 待办事项三
+
+---
+
+### 代码块
+
+在md文档中，直接输入代码会显示成普通文本，不方便排版。这时，可以通过如下操作将代码部分以**代码块**呈现。
+
+1. 在每行代码前加一个缩进（Tab）。
+e.g.
+![代码块方法一](./image-resources/代码块方法1.png)
+
+<br>
+例：
+
+    #include <stdio.h>
+    #include <stdlib.h>
+
+    typedef struct node
+    {
+    	char data;
+    	struct node* pNext;
+    } node;
+
+    typedef node List;
+
+    static node* create(void)
+    {
+    	node* pHead = NULL;
+    	node* pEnd = NULL, * pNew = NULL;
+    	char ch;
+
+    	while (1)
+    	{
+    		scanf("%c", &ch);
+
+    		if (ch == '#')
+    		{
+    			break;
+    		}
+
+    		else if (ch == '\n')
+    		{
+    			continue;
+    		}
+
+    		pNew = (node*)malloc(sizeof(node));
+
+    		if (!pNew)
+    		{
+    			printf("内存分配失败！\n");
+    			return pHead;
+    		}
+
+    		pNew->data = ch;
+    		pNew->pNext = NULL;
+
+    		if (!pHead)
+    		{
+    			pHead = pEnd = pNew;
+    		}
+
+    		else
+    		{
+    			pEnd->pNext = pNew;
+    			pEnd = pNew;
+    		}
+    	}
+
+    	return pHead;
+    }
+
+    static void print(List* pHead)
+    {
+    	List* p_tmp = pHead;
+
+    	while (p_tmp)
+    	{
+    		printf("%c", p_tmp->data);
+    		p_tmp = p_tmp->pNext;
+    	}
+    	printf("\n");
+    }
+
+    static void list_free(List* pHead)
+    {
+    	List* pTmp = pHead;
+    	List* pNext = pHead;
+
+    	while (pTmp)
+    	{
+    		pNext = pTmp->pNext;
+    		free(pTmp);
+    		pTmp = pNext;
+    	}
+    }
+
+    //递归实现链表转置
+    List* list_reverse_recursion(List* pHead)
+    {
+    	List* pTmp = pHead;
+
+    	//处理空链表和尾节点
+    	if (!pTmp || !pTmp->pNext)
+    	{
+    		return pHead;
+    	}
+
+    	node* pHead_new = list_reverse_recursion(pTmp->pNext);	//递归调用
+
+    	pTmp->pNext->pNext = pTmp;	//后节点指向前节点
+    	pTmp->pNext = NULL;	//前节点指向NULL
+
+    	return pHead_new;
+    }
+
+    //循环实现链表转置
+    List* list_reverse_cycle(List* pHead)
+    {
+    	node* pCur = pHead;
+    	node* pPre = NULL, * pNext = NULL;
+
+    	while (pCur)
+    	{
+    		pNext = pCur->pNext;
+    		pCur->pNext = pPre;
+    		pPre = pCur;
+    		pCur = pNext;
+    	}
+
+    	return pPre;
+    }
+
+    int main(void)
+    {
+    	List* str = create();
+
+    	printf("转置前：\n");
+    	print(str);
+    
+    #if 0
+    	str = list_reverse_recursion(str);
+    	printf("转置后：\n");
+    	print(str);
+    #endif
+
+    #if 1
+    	str = list_reverse_cycle(str);
+    	printf("转置后：\n");
+    	print(str);
+    #endif
+
+    	list_free(str);
+
+    	return 0;
+    }
+
+2. 在代码前后分别添加三个或以上“`”，同时可以声明语言类型。
+e.g.
+![代码块方法二](./image-resources/代码块方法2.png)
+
+
+```C
+
+#include <stdio.h>
+#include <math.h>	//引入绝对值函数
+#define EPSILON 1e-9	//定义最小误差
+
+//在C程序中，不能直接用“==”判断两浮点数是否相等，因为浮点数在内存里的二进制表示存在舍入误差。处理这类情况的通用算法是：	\
+	1.定义一个极小的阈值EPSILON；	\
+	2.计算两数之差的绝对值；	\
+	3.若两数差值小于该阈值，就认为两数相等。
+
+//用于处理浮点数相等情况的函数
+int are_equal(double a, double b)
+{
+	return fabs(a - b) < EPSILON;	//若两数在误差范围内相等则返回1值，否则返回0值。
+}
+
+int main()
+{
+	double x, y;
+	printf("enter x:\n");
+	scanf("%lf", &x);	//1.将“%f”改为“%lf”，补全取地址符号。  double类型由“%lf”控制；scanf需要地址。
+	if (are_equal(x,10.0))	//2.正确的判断浮点数是否相等的方式
+		y = 1 / x;
+	else 
+		y = x;	//3.删除else后面的表达式。  else不需要判断条件。
+	printf("f(%.2lf)=%lf\n", x, y);	//4.将"%0.2f"改为“%.2lf”。  应该用%lf控制double类型的x的输出，小数点前方的数字控制最大输出位数，不能填0。
+
+	return 0;
+}
+
+```
+
+3. 行内代码块：在文本中嵌入的代码块需要用单个“\`”符号包括。
+e.g.
+上一个代码块中的`are_equal()`函数用于判断两浮点数是否相等。
+
+---
+
+### 引用
+
+尖括号（右） + 空格 + 文本 = 引用文本
+
+例：
+
+> 遥襟甫畅，逸兴遄飞。爽籁发而清风生，纤歌凝而白云遏。睢园绿竹，气凌彭泽之樽；邺水朱华，光照临川之笔。四美具，二难并。穷睇眄于中天，极娱游于暇日。天高地迥，觉宇宙之无穷；兴尽悲来，识盈虚之有数。望长安于日下，目吴会于云间。地势极而南溟深，天柱高而北辰远。关山难越，谁悲失路之人；萍水相逢，尽是他乡之客。怀帝阍而不见，奉宣室以何年？
+——王勃《滕王阁序》
+
+1. 引用文本内的换行
+    * **空两格换行**  ,不能连换两行，否则会断开原有文本。
+    e.g.
+    > 大小相同（行数列数都相同）的矩阵之间可以相互加减，具体是对每个位置上的元素做加减法。  
+    矩阵乘法则较为复杂。两个矩阵可以相乘，当且仅当第一个矩阵的列数等于第二个矩阵的行数。矩阵乘法满足结合律和分配律，但不满足交换律。
+    
+    *源码*：
+    ```markdown
+
+    > 大小相同（行数列数都相同）的矩阵之间可以相互加减，具体是对每个位置上的元素做加减法。  
+    矩阵乘法则较为复杂。两个矩阵可以相乘，当且仅当第一个矩阵的列数等于第二个矩阵的行数。矩阵乘法满足结合律和分配律，但不满足交换律。
+
+    ```
+
+    * 在**每一段**引用内容前加上右尖括号。
+    *源码*：
+    ```md
+    > 大小相同（行数列数都相同）的矩阵之间可以相互加减，具体是对每个位置上的元素做加减法。
+    > 矩阵乘法则较为复杂。两个矩阵可以相乘，当且仅当第一个矩阵的列数等于第二个矩阵的行数。矩阵乘法满足结合律和分配律，但不满足交换律
+    ```
+
+    * 同一段引用文本内的**空白行**前也要加上右尖括号
+    e.g.
+    > 大小相同（行数列数都相同）的矩阵之间可以相互加减，具体是对每个位置上的元素做加减法。
+    >
+    > 矩阵乘法则较为复杂。两个矩阵可以相乘，当且仅当第一个矩阵的列数等于第二个矩阵的行数。矩阵乘法满足结合律和分配律，但不满足交换律
+
+    *源码*：
+    ```md
+    > 大小相同（行数列数都相同）的矩阵之间可以相互加减，具体是对每个位置上的元素做加减法。
+    >
+    > 矩阵乘法则较为复杂。两个矩阵可以相乘，当且仅当第一个矩阵的列数等于第二个矩阵的行数。矩阵乘法满足结合律和分配律，但不满足交换律
+    ```
+
+2. 引用文本内嵌套md格式
+
+仍需在**每一行格式文本**前加上右尖括号。
+
+例1：
+> 常见的一次性记6分违法行为（中国大陆）：
+> * 驾驶证暂扣期间驾驶：这是非常严重的违规行为。
+> * 高速公路不按规定车道行驶：例如在高速路或城市快速路占用应急车道。
+> * 超速：机动车行驶超过规定时速50%以上。
+> * 不避让校车：遇校车停靠上下学生时未按规定避让。
+> * 危险品运输：驾驶机动车运输危险化学品，未经批准进入限制通行区域。
+
+*源码*：
+```md
+> 常见的一次性记6分违法行为（中国大陆）：
+> * 驾驶证暂扣期间驾驶：这是非常严重的违规行为。
+> * 高速公路不按规定车道行驶：例如在高速路或城市快速路占用应急车道。
+> * 超速：机动车行驶超过规定时速50%以上。
+> * 不避让校车：遇校车停靠上下学生时未按规定避让。
+> * 危险品运输：驾驶机动车运输危险化学品，未经批准进入限制通行区域。
+```
+
+例2：
+> Java：HelloWorld程序
+> ```java
+>public class HelloWorld {
+>    public static void main(String[] args) {
+>        System.out.println("Hello, World!");
+>    }
+>}
+> ```
+
+*源码*：
+```md
+> Java：HelloWorld程序
+> ```java
+>public class HelloWorld {
+>    public static void main(String[] args) {
+>        System.out.println("Hello, World!");
+>    }
+>}
+> ```
+```
+
+例3：
+> 一级文本
+> > 二级文本
+> > > 三级文本
+
+*源码*：
+```md
+> 一级文本
+> > 二级文本
+> > > 三级文本
+```
+
